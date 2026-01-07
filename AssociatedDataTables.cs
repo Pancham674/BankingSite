@@ -1,16 +1,16 @@
-﻿using System.Windows.Forms;
-using System.Data;
+﻿using System.Data;
+using System.Windows.Forms;
 
 namespace BankingSite
 {
-	public partial class AssociatedDataTables : Form
-	{
-		public AssociatedDataTables(DataTable data)
-		{
-			InitializeComponent();
+    public partial class AssociatedDataTables : Form
+    {
+        public AssociatedDataTables(DataTable data)
+        {
+            InitializeComponent();
 
-			dgvAssosiatedDataTable.DataSource = data;
-			dgvAssosiatedDataTable.Refresh();
-		}
-	}
+            dgvAssosiatedDataTable.DataSource = data;
+            dgvAssosiatedDataTable.Refresh();
+        }
+    }
 }

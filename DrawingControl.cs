@@ -1,25 +1,25 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using System;
 
 namespace BankingSite
 {
-	public  class DrawingControl
-	{
-		[DllImport("user32.dll")]
-		public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
+    public class DrawingControl
+    {
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
 
-		private const int WM_SETREDRAW = 11;
+        private const int WM_SETREDRAW = 11;
 
-		public static void SuspendDrawing(Control myControl)
-		{
-			SendMessage(myControl.Handle, WM_SETREDRAW, false, 0);
-		}
+        public static void SuspendDrawing(Control myControl)
+        {
+            SendMessage(myControl.Handle, WM_SETREDRAW, false, 0);
+        }
 
-		public static void ResumeDrawing(Control myControl)
-		{
-			SendMessage(myControl.Handle, WM_SETREDRAW, true, 0);
-			myControl.Refresh();
-		}
-	}
+        public static void ResumeDrawing(Control myControl)
+        {
+            SendMessage(myControl.Handle, WM_SETREDRAW, true, 0);
+            myControl.Refresh();
+        }
+    }
 }
