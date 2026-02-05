@@ -94,6 +94,7 @@
 			this.lblUsername = new System.Windows.Forms.Label();
 			this.txtbUsername = new System.Windows.Forms.TextBox();
 			this.tcWindow = new System.Windows.Forms.TabControl();
+			this.btnDeleteAllData = new System.Windows.Forms.Button();
 			iDLabel = new System.Windows.Forms.Label();
 			firstNameLabel = new System.Windows.Forms.Label();
 			lastNameLabel = new System.Windows.Forms.Label();
@@ -831,6 +832,7 @@
 			this.pnlDbConnection.AutoSize = true;
 			this.pnlDbConnection.BackColor = System.Drawing.SystemColors.Control;
 			this.pnlDbConnection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pnlDbConnection.Controls.Add(this.btnDeleteAllData);
 			this.pnlDbConnection.Controls.Add(this.btnInsertData);
 			this.pnlDbConnection.Controls.Add(this.lblDbConnectionTitle);
 			this.pnlDbConnection.Controls.Add(this.lblDataBaseName);
@@ -854,7 +856,7 @@
 			this.btnInsertData.Cursor = System.Windows.Forms.Cursors.Hand;
 			this.btnInsertData.Enabled = false;
 			this.btnInsertData.Font = new System.Drawing.Font("Bahnschrift Condensed", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.btnInsertData.Location = new System.Drawing.Point(294, 293);
+			this.btnInsertData.Location = new System.Drawing.Point(195, 292);
 			this.btnInsertData.MaximumSize = new System.Drawing.Size(130, 40);
 			this.btnInsertData.MinimumSize = new System.Drawing.Size(130, 40);
 			this.btnInsertData.Name = "btnInsertData";
@@ -894,7 +896,7 @@
 			this.btnConnectToDB.BackColor = System.Drawing.SystemColors.Window;
 			this.btnConnectToDB.Cursor = System.Windows.Forms.Cursors.Hand;
 			this.btnConnectToDB.Font = new System.Drawing.Font("Bahnschrift Condensed", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.btnConnectToDB.Location = new System.Drawing.Point(97, 293);
+			this.btnConnectToDB.Location = new System.Drawing.Point(46, 292);
 			this.btnConnectToDB.MaximumSize = new System.Drawing.Size(130, 40);
 			this.btnConnectToDB.MinimumSize = new System.Drawing.Size(130, 40);
 			this.btnConnectToDB.Name = "btnConnectToDB";
@@ -1000,6 +1002,23 @@
 			this.tcWindow.SelectedIndexChanged += new System.EventHandler(this.tcWindow_SelectedIndexChanged);
 			this.tcWindow.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tcWindow_Selecting);
 			// 
+			// btnDeleteAllData
+			// 
+			this.btnDeleteAllData.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.btnDeleteAllData.BackColor = System.Drawing.SystemColors.Window;
+			this.btnDeleteAllData.Cursor = System.Windows.Forms.Cursors.Hand;
+			this.btnDeleteAllData.Enabled = false;
+			this.btnDeleteAllData.Font = new System.Drawing.Font("Bahnschrift Condensed", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.btnDeleteAllData.Location = new System.Drawing.Point(344, 292);
+			this.btnDeleteAllData.MaximumSize = new System.Drawing.Size(130, 40);
+			this.btnDeleteAllData.MinimumSize = new System.Drawing.Size(130, 40);
+			this.btnDeleteAllData.Name = "btnDeleteAllData";
+			this.btnDeleteAllData.Size = new System.Drawing.Size(130, 40);
+			this.btnDeleteAllData.TabIndex = 26;
+			this.btnDeleteAllData.Text = "Delete All Data";
+			this.btnDeleteAllData.UseVisualStyleBackColor = false;
+			this.btnDeleteAllData.Click += new System.EventHandler(this.btnDeleteAllData_Click);
+			// 
 			// MainWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1095,5 +1114,6 @@
 		private System.Windows.Forms.Button btnShowTransactions;
 		private System.Windows.Forms.Button btnInsertData;
 		private System.Windows.Forms.ComboBox customerAddressIDComboBox;
+		private System.Windows.Forms.Button btnDeleteAllData;
 	}
 }

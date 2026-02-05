@@ -371,18 +371,31 @@ namespace BankingSite
         #endregion
 
         #region SQL Delete Methods
-        void DeleteData(string myType, int myID)
+        public void DeleteAllDataFromAllTables()
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandText = File.ReadAllText(string.Concat(DELETE_FOLDER, myType, SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(DELETE_FOLDER, "AllData", SQL_EXTENSION));
+                
                 cmd.CommandTimeout = 5;
-
-                cmd.Parameters.AddWithValue("@ID", myID);
                 cmd.ExecuteNonQuery();
-            }
+			}
+		}
+
+		void DeleteData(string myType, int myID)
+        {
+                using (SqlConnection cn = new SqlConnection(_connectionString))
+                {
+                    cn.Open();
+                    SqlCommand cmd = cn.CreateCommand();
+                    cmd.CommandText = File.ReadAllText(string.Concat(DELETE_FOLDER, myType, SQL_EXTENSION));
+                    cmd.CommandTimeout = 5;
+
+                    cmd.Parameters.AddWithValue("@ID", myID);
+                    cmd.ExecuteNonQuery();
+                }
         }
 
         public void DeleteCustomerWithID(int myCustomerID)

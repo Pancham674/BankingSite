@@ -265,10 +265,10 @@ namespace BankingSite
             }
         }
 
-        /// <summary>
-        /// Uses the TableAdapters to refill all dataGridViews.
-        /// </summary>
-        void RefillDGVs()
+		/// <summary>
+		/// Refreshes all DataTables, DataGridViews and Controls associated with them.
+		/// </summary>
+		void RefillDGVs()
         {
             RefreshAddressDataBindingsSources();
             RefreshCustomerDataBingingsSources();
@@ -320,14 +320,40 @@ namespace BankingSite
         void ConnectedToDatabase()
         {
             btnInsertData.Enabled = true;
-            _isConnectedAndHasTables = true;
+            btnDeleteAllData.Enabled = true;
+			_isConnectedAndHasTables = true;
             Text = string.Concat("BankingSite - Connected to ", cbDbNames.Text);
         }
 
-        #endregion
+		void btnDeleteAllData_Click(object sender, EventArgs e)
+		{
+            if (_addressTable.Rows.Count == 0 && _customerTable.Rows.Count == 0 && _accountTable.Rows.Count == 0 && _transactionTable.Rows.Count == 0)
+            { 
+                MessageBox.Show("There is no data to delete.", "No data to delete");
+                return;
+			}
 
-        #region Customer Tab
-        private void btnCreateNewCustomer_Click(object sender, EventArgs e)
+			if (MessageBox.Show("Are you sure that you want to delete ALL data from all tables?", "Delete all data", MessageBoxButtons.YesNo) == DialogResult.No)
+            {
+                return;
+			}
+
+            try
+            {
+                _dbInt.DeleteAllDataFromAllTables();
+		    	MessageBox.Show("Every data has been deleted.", "Data deleted");
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(string.Concat(ex.Message, "\nSome data may have been deleted."), "An Error occured");
+			}
+
+			RefillDGVs();
+		}
+		#endregion
+
+		#region Customer Tab
+		private void btnCreateNewCustomer_Click(object sender, EventArgs e)
         {
             CreateNew cnForm = new CreateNew(_dbInt, CreateNew.CreateType.Customer);
             if (cnForm.ShowDialog() == DialogResult.Cancel)
@@ -679,6 +705,6 @@ namespace BankingSite
             SetDataBindings(transactionIDTextBox, _transactionTable, "ID");
             ResumeDrawingOfTransaction();
         }
-        #endregion
-    }
+		#endregion		
+	}
 }
