@@ -29,7 +29,7 @@ Overview of all customers and addresses along with the ability to add, change an
 
 1. Clone repo:
    ```bash
-   git clone https://github.com/PPahl04/BankingSite.git
+   git clone https://github.com/Pancham674/BankingSite.git
    cd BankingSite
    
 2. Run program
