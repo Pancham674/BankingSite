@@ -116,6 +116,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -123,7 +124,47 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="images\AccountTab.png" />
+    <Content Include="images\CustomerAddressTab.png" />
+    <Content Include="images\DBConnection.png" />
+    <Content Include="images\NewCustomer.png" />
+    <Content Include="images\OwnedAccounts.png" />
+    <Content Include="images\TransactionsTab.png" />
+    <Content Include="SQL\CreateTable\Account.sql" />
+    <Content Include="SQL\CreateTable\AccountTrigger.sql" />
+    <Content Include="SQL\CreateTable\Address.sql" />
+    <Content Include="SQL\CreateTable\Customer.sql" />
+    <Content Include="SQL\CreateTable\CustomerTrigger.sql" />
+    <Content Include="SQL\CreateTable\Transaction.sql" />
+    <Content Include="SQL\DeleteData\Account.sql" />
+    <Content Include="SQL\DeleteData\Address.sql" />
+    <Content Include="SQL\DeleteData\AllData.sql" />
+    <Content Include="SQL\DeleteData\Customer.sql" />
+    <Content Include="SQL\DeleteData\Transaction.sql" />
+    <Content Include="SQL\GetData\AllAccountIDs.sql" />
+    <Content Include="SQL\GetData\AllAccounts.sql" />
+    <Content Include="SQL\GetData\AllAddresses.sql" />
+    <Content Include="SQL\GetData\AllAssociatedAccounts.sql" />
+    <Content Include="SQL\GetData\AllAssociatedTransactions.sql" />
+    <Content Include="SQL\GetData\AllCustomers.sql" />
+    <Content Include="SQL\GetData\AllTransactions.sql" />
+    <Content Include="SQL\GetData\BalanceFromAccountID.sql" />
+    <Content Include="SQL\InsertData\Account.sql" />
+    <Content Include="SQL\InsertData\Address.sql" />
+    <Content Include="SQL\InsertData\Customer.sql" />
+    <Content Include="SQL\InsertData\CustomerNoAddress.sql" />
+    <Content Include="SQL\InsertData\DefaultAccounts.sql" />
+    <Content Include="SQL\InsertData\DefaultAddresses.sql" />
+    <Content Include="SQL\InsertData\DefaultCustomers.sql" />
+    <Content Include="SQL\InsertData\DefaultTransactions.sql" />
+    <Content Include="SQL\InsertData\Transaction.sql" />
+    <Content Include="SQL\UpdateTable\AccountIban.sql" />
+    <Content Include="SQL\UpdateTable\AccountBalance.sql" />
+    <Content Include="SQL\UpdateTable\Address.sql" />
+    <Content Include="SQL\UpdateTable\Customer.sql" />
+    <Content Include="SQL\UpdateTable\CustomerNoAddress.sql" />
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
       <Visible>False</Visible>

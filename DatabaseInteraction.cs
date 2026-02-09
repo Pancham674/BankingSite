@@ -8,11 +8,11 @@ using System.Windows.Forms;
 
 namespace BankingSite
 {
-    public class DatabaseInteraction
+    public static class DatabaseInteraction
     {
-        #region class variables
-        string _connectionString;
-        string _connectedDatabase;
+		#region class variables
+		static string _connectionString;
+		static string _connectedDatabase;
 
         const string SQL_FOLDER = @"..\..\SQL\";
         const string INSERT_DATA_FOLDER = SQL_FOLDER + @"InsertData\";
@@ -38,7 +38,7 @@ namespace BankingSite
         /// <param name="myUsername"></param>
         /// <param name="myPassword"></param>
         /// <returns></returns>
-        public void CanConnectToServer(string myDb, string myServerName, string myUsername, string myPassword)
+        public static void CanConnectToServer(string myDb, string myServerName, string myUsername, string myPassword)
         {
             string cnString = string.Concat("Data Source=", myServerName, ";Initial Catalog=", myDb, ";UID=", myUsername, ";Password=", myPassword,
                         ";Integrated Security=False;TrustServerCertificate=True");
@@ -57,7 +57,7 @@ namespace BankingSite
         /// Gets all Database Names within the currently connected server.
         /// </summary>
         /// <returns></returns>
-        public string[] GetDatabases()
+        public static string[] GetDatabases()
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -86,7 +86,7 @@ namespace BankingSite
             }
         }
 
-        public List<string> GetMissingTables()
+        public static List<string> GetMissingTables()
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -113,16 +113,16 @@ namespace BankingSite
             }
         }
 
-        public bool IsConnectedToSysDb()
+        public static bool IsConnectedToSysDb()
         {
             string[] systemDatabases = { "master", "tempdb", "model", "msdb" };
             return systemDatabases.Contains(_connectedDatabase);
         }
 
-        /// <summary>
-        /// Creates the required tables that are missing.
-        /// </summary>
-        public void CreateTables(List<string> myMissingTables)
+		/// <summary>
+		/// Creates the required tables that are missing.
+		/// </summary>
+		public static void CreateTables(List<string> myMissingTables)
         {
             bool tablesCreated = false;
             foreach (string missingTable in myMissingTables)
@@ -170,7 +170,7 @@ namespace BankingSite
             }
         }
 
-        void CreateTrigger()
+		static void CreateTrigger()
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -188,7 +188,7 @@ namespace BankingSite
         #endregion
 
         #region SQL Insert Methods
-        public void InsertToAllTables()
+        public static void InsertToAllTables()
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -210,7 +210,7 @@ namespace BankingSite
             }
         }
 
-        public void InsertCustomer(string myFirstName, string myLastName, int myPhoneNumber, string myEmail, int myAddressID)
+        public static void InsertCustomer(string myFirstName, string myLastName, int myPhoneNumber, string myEmail, int myAddressID)
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -228,7 +228,7 @@ namespace BankingSite
             }
         }
 
-        public void InsertCustomerNoAddress(string myFirstName, string myLastName, int myPhoneNumber, string myEmail)
+        public static void InsertCustomerNoAddress(string myFirstName, string myLastName, int myPhoneNumber, string myEmail)
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -245,7 +245,7 @@ namespace BankingSite
             }
         }
 
-        public void InsertAddress(string myStreetName, int myStreetNumber, int myZipCode, string myCity)
+        public static void InsertAddress(string myStreetName, int myStreetNumber, int myZipCode, string myCity)
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -262,23 +262,31 @@ namespace BankingSite
             }
         }
 
-        public void InsertAccount(string myIban, int myBalance, int myCustomerID)
+        public static void InsertAccount(int myBalance, int myCustomerID, string myHashCode, string myCountryCode)
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
-            {
+            {   //Insert the new account first, then update its IBAN so it has the correct account id in it
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
                 cmd.CommandText = File.ReadAllText(string.Concat(INSERT_DATA_FOLDER, ACCOUNT, SQL_EXTENSION));
                 cmd.CommandTimeout = 5;
 
-                cmd.Parameters.AddWithValue("@IBAN", myIban);
+                cmd.Parameters.AddWithValue("@IBAN", "Empty");
                 cmd.Parameters.AddWithValue("@Balance", myBalance);
                 cmd.Parameters.AddWithValue("@Customer_ID", myCustomerID);
                 cmd.ExecuteNonQuery();
-            }
-        }
 
-        public void InsertTransaction(DateTime myDate, int myAmount, string myIntendedUse, string myType, int myReceiverID, int mySenderID)
+                int id = GetLastAccountID();
+				string iban = myCountryCode + myCustomerID + id + myHashCode;
+                cmd.CommandText = File.ReadAllText(String.Concat(UPDATE_TABLE_FOLDER, ACCOUNT, "Iban", SQL_EXTENSION));
+
+                cmd.Parameters["@IBAN"].Value = iban;
+                cmd.Parameters.AddWithValue("@ID", id);
+                cmd.ExecuteNonQuery();
+			}
+		}
+
+        public static void InsertTransaction(DateTime myDate, int myAmount, string myIntendedUse, string myType, int myReceiverID, int mySenderID)
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -299,7 +307,7 @@ namespace BankingSite
         #endregion
 
         #region SQL Update Methods
-        public void UpdateCustomer(string myFirstName, string myLastName, int myPhoneNumber, string myEmail, object myAddressID, int myCustomerID)
+        public static void UpdateCustomer(string myFirstName, string myLastName, int myPhoneNumber, string myEmail, object myAddressID, int myCustomerID)
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -318,7 +326,7 @@ namespace BankingSite
             }
         }
 
-        public void UpdateCustomerNoAddress(string myFirstName, string myLastName, int myPhoneNumber, string myEmail, int myCustomerID)
+        public static void UpdateCustomerNoAddress(string myFirstName, string myLastName, int myPhoneNumber, string myEmail, int myCustomerID)
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -336,7 +344,7 @@ namespace BankingSite
             }
         }
 
-        void UpdateAccountBalance(int myNewBalance, int myAccountID)
+        static void UpdateAccountBalance(int myNewBalance, int myAccountID)
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -351,7 +359,7 @@ namespace BankingSite
             }
         }
 
-        public void UpdateAddress(string myStreetName, int myStreetNumber, int myZipCode, string myCity, int myID)
+        public static void UpdateAddress(string myStreetName, int myStreetNumber, int myZipCode, string myCity, int myID)
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -371,7 +379,7 @@ namespace BankingSite
         #endregion
 
         #region SQL Delete Methods
-        public void DeleteAllDataFromAllTables()
+        public static void DeleteAllDataFromAllTables()
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -384,43 +392,43 @@ namespace BankingSite
 			}
 		}
 
-		void DeleteData(string myType, int myID)
+		static void DeleteData(string myType, int myID)
         {
-                using (SqlConnection cn = new SqlConnection(_connectionString))
-                {
-                    cn.Open();
-                    SqlCommand cmd = cn.CreateCommand();
-                    cmd.CommandText = File.ReadAllText(string.Concat(DELETE_FOLDER, myType, SQL_EXTENSION));
-                    cmd.CommandTimeout = 5;
+            using (SqlConnection cn = new SqlConnection(_connectionString))
+            {
+                cn.Open();
+                SqlCommand cmd = cn.CreateCommand();
+                cmd.CommandText = File.ReadAllText(string.Concat(DELETE_FOLDER, myType, SQL_EXTENSION));
+                cmd.CommandTimeout = 5;
 
-                    cmd.Parameters.AddWithValue("@ID", myID);
-                    cmd.ExecuteNonQuery();
-                }
+                cmd.Parameters.AddWithValue("@ID", myID);
+                cmd.ExecuteNonQuery();
+            }
         }
 
-        public void DeleteCustomerWithID(int myCustomerID)
+        public static void DeleteCustomerWithID(int myCustomerID)
         {
             DeleteData(CUSTOMER, myCustomerID);
         }
 
-        public void DeleteAccountWithID(int myAccountID)
+        public static void DeleteAccountWithID(int myAccountID)
         {
             DeleteData(ACCOUNT, myAccountID);
         }
 
-        public void DeleteTransactionWithID(int myTransactionID)
+        public static void DeleteTransactionWithID(int myTransactionID)
         {
             DeleteData(TRANSACTION, myTransactionID);
         }
 
-        public void DeleteAddressWithID(int myAddressID)
+        public static void DeleteAddressWithID(int myAddressID)
         {
             DeleteData(ADDRESS, myAddressID);
         }
         #endregion
 
         #region Get DataTable Methods
-        DataTable GetDataTable(string myCommandText)
+        static DataTable GetDataTable(string myCommandText)
         {
             DataTable dt = new DataTable();
             try
@@ -444,42 +452,43 @@ namespace BankingSite
             return dt;
         }
 
-        public DataTable GetOwnedAccountsByCustomerID(int myCustomerID)
+        public static DataTable GetOwnedAccountsByCustomerID(int myCustomerID)
         {
             string cmdText = File.ReadAllText(string.Concat(GET_DATA_FOLDER, "AllAssociatedAccounts", SQL_EXTENSION));
             return GetDataTable(string.Format(cmdText, myCustomerID));
         }
 
-        public DataTable GetAllTransactionsFromAccountID(int myAccountID)
+        public static DataTable GetAllTransactionsFromAccountID(int myAccountID)
         {
             string cmdText = File.ReadAllText(string.Concat(GET_DATA_FOLDER, "AllAssociatedTransactions", SQL_EXTENSION));
             return GetDataTable(string.Format(cmdText, myAccountID));
         }
 
-        public DataTable GetAllAddresses()
+        public static DataTable GetAllAddresses()
         {
             return GetDataTable(File.ReadAllText(string.Concat(GET_DATA_FOLDER, "AllAddresses", SQL_EXTENSION)));
         }
 
-        public DataTable GetAllCustomers()
+        public static DataTable GetAllCustomers()
         {
             return GetDataTable(File.ReadAllText(string.Concat(GET_DATA_FOLDER, "AllCustomers", SQL_EXTENSION)));
         }
 
-        public DataTable GetAllAccounts()
+        public static DataTable GetAllAccounts()
         {
             return GetDataTable(File.ReadAllText(string.Concat(GET_DATA_FOLDER, "AllAccounts", SQL_EXTENSION)));
         }
 
-        public DataTable GetAllTransactions()
+        public static DataTable GetAllTransactions()
         {
             return GetDataTable(File.ReadAllText(string.Concat(GET_DATA_FOLDER, "AllTransactions", SQL_EXTENSION)));
         }
 
-        public int GetLastAccountID()
+        public static int GetLastAccountID()
         {
-            DataTable dt = GetDataTable("SELECT TOP 1 ID FROM [dbo].[Account] ORDER BY ID DESC");
-            return (int)dt.Rows[0].ItemArray[0];
+            DataTable dt = GetDataTable("SELECT IDENT_CURRENT('Account')");
+            int lastId = dt.Rows.Count == 0 ? 0 : Convert.ToInt32(dt.Rows[0].ItemArray[0]);
+            return lastId;
         }
         #endregion
 
@@ -489,7 +498,7 @@ namespace BankingSite
         /// </summary>
         /// <param name="myAccountID"></param>
         /// <param name="myAmount"></param>
-        public void WithdrawFromAccount(int myAccountID, int myAmount)
+        public static void WithdrawFromAccount(int myAccountID, int myAmount)
         {
             string cmdText = File.ReadAllText(string.Concat(GET_DATA_FOLDER, "BalanceFromAccountID", SQL_EXTENSION));
             DataTable temp = GetDataTable(string.Format(cmdText, myAccountID));
@@ -505,7 +514,7 @@ namespace BankingSite
         /// </summary>
         /// <param name="myAccountID"></param>
         /// <param name="myAmount"></param>
-        public void DepositToAccount(int myAccountID, int myAmount)
+        public static void DepositToAccount(int myAccountID, int myAmount)
         {
             string cmdText = File.ReadAllText(string.Concat(GET_DATA_FOLDER, "BalanceFromAccountID", SQL_EXTENSION));
             DataTable temp = GetDataTable(string.Format(cmdText, myAccountID));
@@ -522,7 +531,7 @@ namespace BankingSite
         /// <param name="mySenderID"></param>
         /// <param name="myReceiverID"></param>
         /// <param name="myAmount"></param>
-        public void TransferFromSenderToReceiver(int mySenderID, int myReceiverID, int myAmount)
+        public static void TransferFromSenderToReceiver(int mySenderID, int myReceiverID, int myAmount)
         {
             WithdrawFromAccount(mySenderID, myAmount);
             DepositToAccount(myReceiverID, myAmount);
