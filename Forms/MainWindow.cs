@@ -16,19 +16,15 @@ namespace BankingSite
         DataTable _accountTable;
         DataTable _transactionTable;
 
-        DatabaseInteraction _dbInt;
-
         #region Server Connection
         public MainWindow()
         {
             InitializeComponent();
-
-            _dbInt = new DatabaseInteraction();
         }
 
         private void Window_Load(object sender, EventArgs e)
         {
-            txtbServerName.Text = string.Concat(Environment.MachineName, "\\");
+            txtbServerName.Text = string.Concat(Environment.MachineName, @"\");
         }
 
         /// <summary>
@@ -143,7 +139,7 @@ namespace BankingSite
                 }
 
                 cbDbNames.Items.Clear();
-                string[] databaseNames = _dbInt.GetDatabases();
+                string[] databaseNames = DatabaseInteraction.GetDatabases();
                 cbDbNames.Items.AddRange(databaseNames);
             }
             catch (Exception ex)
@@ -185,7 +181,7 @@ namespace BankingSite
 
             try
             {
-                _dbInt.InsertToAllTables();
+                DatabaseInteraction.InsertToAllTables();
 
                 RefillDGVs();
                 _isConnectedAndHasTables = true;
@@ -206,7 +202,7 @@ namespace BankingSite
                     return;
                 }
                     
-                if (_dbInt.IsConnectedToSysDb())
+                if (DatabaseInteraction.IsConnectedToSysDb())
                 {
                     btnInsertData.Enabled = false;
                     _isConnectedAndHasTables = false;
@@ -254,7 +250,7 @@ namespace BankingSite
                     throw new Exception("Please provide a Server name, Username and Password before attemping to connect.");
                 }
 
-                _dbInt.CanConnectToServer(String.IsNullOrWhiteSpace(cbDbNames.Text) ? "master" : cbDbNames.Text, txtbServerName.Text, txtbUsername.Text, txtbPassword.Text);
+                DatabaseInteraction.CanConnectToServer(String.IsNullOrWhiteSpace(cbDbNames.Text) ? "master" : cbDbNames.Text, txtbServerName.Text, txtbUsername.Text, txtbPassword.Text);
                 return true;
             }
             catch (Exception e)
@@ -300,7 +296,7 @@ namespace BankingSite
         /// <returns></returns>
         bool DatabaseContainsAllTables()
         {
-            _missingTables = _dbInt.GetMissingTables();
+            _missingTables = DatabaseInteraction.GetMissingTables();
             return _missingTables.Count == 0;
         }
 
@@ -309,7 +305,7 @@ namespace BankingSite
         /// </summary>
         void CreateTables()
         {
-            _dbInt.CreateTables(_missingTables);
+            DatabaseInteraction.CreateTables(_missingTables);
             _missingTables.Clear();
             RefillDGVs();
         }
@@ -340,7 +336,7 @@ namespace BankingSite
 
             try
             {
-                _dbInt.DeleteAllDataFromAllTables();
+                DatabaseInteraction.DeleteAllDataFromAllTables();
 		    	MessageBox.Show("Every data has been deleted.", "Data deleted");
 			}
 			catch (Exception ex)
@@ -355,7 +351,7 @@ namespace BankingSite
 		#region Customer Tab
 		private void btnCreateNewCustomer_Click(object sender, EventArgs e)
         {
-            CreateNew cnForm = new CreateNew(_dbInt, CreateNew.CreateType.Customer);
+            CreateNew cnForm = new CreateNew(CreateNew.CreateType.Customer);
             if (cnForm.ShowDialog() == DialogResult.Cancel)
             {
                 return;
@@ -392,12 +388,12 @@ namespace BankingSite
                 //address to update may be set to null
                 if (String.IsNullOrWhiteSpace(customerAddressIDComboBox.Text))
                 {
-                    _dbInt.UpdateCustomerNoAddress(firstN, lastN, phoneN, email, custID);
+                    DatabaseInteraction.UpdateCustomerNoAddress(firstN, lastN, phoneN, email, custID);
                 }
                 else
                 {
                     int addrID = Convert.ToInt32(customerAddressIDComboBox.Text);
-                    _dbInt.UpdateCustomer(firstN, lastN, phoneN, email, addrID, custID);
+                    DatabaseInteraction.UpdateCustomer(firstN, lastN, phoneN, email, addrID, custID);
                 }
                 RefreshCustomerDataBingingsSources();
             }
@@ -418,7 +414,7 @@ namespace BankingSite
                 "\nThis will also delete all accounts they own."), "Delete selected customer",
                         MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                _dbInt.DeleteCustomerWithID(id);
+                DatabaseInteraction.DeleteCustomerWithID(id);
                 RefreshCustomerDataBingingsSources();
                 RefreshAccountDataBindingsSources();
                 RefreshTransactionDataBindingsSources();
@@ -437,7 +433,7 @@ namespace BankingSite
                 return;
             }
 
-            DataTable accounts = _dbInt.GetOwnedAccountsByCustomerID(custID);
+            DataTable accounts = DatabaseInteraction.GetOwnedAccountsByCustomerID(custID);
 
             if (accounts.Rows.Count == 0)
             {
@@ -447,7 +443,7 @@ namespace BankingSite
 
             AssociatedDataTables owned = new AssociatedDataTables(accounts);
             owned.Text = string.Concat("Owned Accounts From Customer with ID ", custID);
-            owned.Show();
+            owned.Show(this);
         }
 
         /// <summary>
@@ -456,7 +452,7 @@ namespace BankingSite
         void RefreshCustomerDataBingingsSources()
         {
             StopDrawingOfCustomerAddress();
-            _customerTable = _dbInt.GetAllCustomers();
+            _customerTable = DatabaseInteraction.GetAllCustomers();
             dgvCustomers.DataSource = _customerTable;
 
             SetDataBindings(customerIDTextBox, _customerTable, "ID");
@@ -508,7 +504,7 @@ namespace BankingSite
         #region Address Tab
         private void btnCreateNewAddress_Click(object sender, EventArgs e)
         {
-            CreateNew cnForm = new CreateNew(_dbInt, CreateNew.CreateType.Address);
+            CreateNew cnForm = new CreateNew(CreateNew.CreateType.Address);
 
             if (cnForm.ShowDialog() == DialogResult.Cancel)
             {
@@ -544,7 +540,7 @@ namespace BankingSite
 
             try
             {
-                _dbInt.UpdateAddress(streetName, streetNumber, zipCode, city, addrID);
+                DatabaseInteraction.UpdateAddress(streetName, streetNumber, zipCode, city, addrID);
                 RefreshAddressDataBindingsSources();
             }
             catch (Exception ex)
@@ -564,7 +560,7 @@ namespace BankingSite
                 "\nCustomers living at this place will become homeless."), "Delete selected address",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                _dbInt.DeleteAddressWithID(id);
+                DatabaseInteraction.DeleteAddressWithID(id);
                 RefreshAddressDataBindingsSources();
                 RefreshCustomerDataBingingsSources();
             }
@@ -576,7 +572,7 @@ namespace BankingSite
         void RefreshAddressDataBindingsSources()
         {
             StopDrawingOfCustomerAddress();
-            _addressTable = _dbInt.GetAllAddresses();
+            _addressTable = DatabaseInteraction.GetAllAddresses();
             dgvAddresses.DataSource = _addressTable;
 
             //address ui controls
@@ -598,7 +594,7 @@ namespace BankingSite
                 return;
             }
 
-            CreateNew cnForm = new CreateNew(_dbInt, CreateNew.CreateType.Account);
+            CreateNew cnForm = new CreateNew(CreateNew.CreateType.Account);
             if (cnForm.ShowDialog() == DialogResult.Cancel)
             {
                 return;
@@ -619,7 +615,7 @@ namespace BankingSite
                 return;
             }
 
-            DataTable transactions = _dbInt.GetAllTransactionsFromAccountID(accID);
+            DataTable transactions = DatabaseInteraction.GetAllTransactionsFromAccountID(accID);
             if (transactions.Rows.Count == 0)
             {
                 MessageBox.Show("The selected account is not associated with any transactions.", "Account has no transactions.");
@@ -628,7 +624,7 @@ namespace BankingSite
 
             AssociatedDataTables owned = new AssociatedDataTables(transactions);
             owned.Text = string.Concat("Transactions Associated with Account ID ", accID);
-            owned.Show();
+            owned.Show(this);
         }
 
         private void btnDeleteSelectedAccount_Click(object sender, EventArgs e)
@@ -642,7 +638,7 @@ namespace BankingSite
                 "\n this will also delete transactions associated with this account."), "Delete selected account",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                _dbInt.DeleteAccountWithID(accID);
+                DatabaseInteraction.DeleteAccountWithID(accID);
                 RefreshAccountDataBindingsSources();
                 RefreshTransactionDataBindingsSources();
             }
@@ -654,7 +650,7 @@ namespace BankingSite
         void RefreshAccountDataBindingsSources()
         {
             StopDrawingOfAccount();
-            _accountTable = _dbInt.GetAllAccounts();
+            _accountTable = DatabaseInteraction.GetAllAccounts();
             dgvAccounts.DataSource = _accountTable;
             SetDataBindings(accountIDTextBox, _accountTable, "ID");
             ResumeDrawingOfAccount();
@@ -670,7 +666,7 @@ namespace BankingSite
                 return;
             }
 
-            CreateNew cnForm = new CreateNew(_dbInt, CreateNew.CreateType.Transaction);
+            CreateNew cnForm = new CreateNew(CreateNew.CreateType.Transaction);
             if (cnForm.ShowDialog() == DialogResult.Cancel)
             {
                 return;
@@ -689,7 +685,7 @@ namespace BankingSite
             if (MessageBox.Show(string.Concat("Are you sure you want to delete the transaction with the ID: ", transactionIDTextBox.Text, "?"), "Delete selected Transaction",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                _dbInt.DeleteTransactionWithID(id);
+                DatabaseInteraction.DeleteTransactionWithID(id);
                 RefreshTransactionDataBindingsSources();
             }
         }
@@ -700,7 +696,7 @@ namespace BankingSite
         void RefreshTransactionDataBindingsSources()
         {
             StopDrawingOfTransaction();
-            _transactionTable = _dbInt.GetAllTransactions();
+            _transactionTable = DatabaseInteraction.GetAllTransactions();
             dgvTransactions.DataSource = _transactionTable;
             SetDataBindings(transactionIDTextBox, _transactionTable, "ID");
             ResumeDrawingOfTransaction();

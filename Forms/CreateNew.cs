@@ -8,7 +8,6 @@ namespace BankingSite
 {
     public partial class CreateNew : Form
     {
-        DatabaseInteraction _dbInt;
         bool _hasCanceled = true;
         CreateType _type;
 
@@ -16,11 +15,10 @@ namespace BankingSite
         /// Will determine which panel (that holds all neccesary UI) to use by its parameters
         /// </summary>
         /// <param name="myCreateType"></param>
-        public CreateNew(DatabaseInteraction myDbInt, CreateType myCreateType)
+        public CreateNew(CreateType myCreateType)
         {
             InitializeComponent();
 
-            _dbInt = myDbInt;
             _type = myCreateType;
             string title = "Create New ";
 
@@ -81,7 +79,7 @@ namespace BankingSite
         /// </summary>
         void GetAddressIDs()
         {
-            DataTable addrIDs = _dbInt.GetAllAddresses();
+            DataTable addrIDs = DatabaseInteraction.GetAllAddresses();
 
             foreach (DataColumn dc in addrIDs.Columns)
             {
@@ -99,7 +97,7 @@ namespace BankingSite
         /// </summary>
         void GetCustomerIDs()
         {
-            DataTable custIDs = _dbInt.GetAllCustomers();
+            DataTable custIDs = DatabaseInteraction.GetAllCustomers();
 
             customer_IDComboBox.DataSource = custIDs;
             customer_IDComboBox.DisplayMember = "ID";
@@ -110,7 +108,7 @@ namespace BankingSite
         /// </summary>
         void GetAccountIDs()
         {
-            DataTable accIDs = _dbInt.GetAllAccounts();
+            DataTable accIDs = DatabaseInteraction.GetAllAccounts();
 
             accountReceiver_IDComboBox.DataSource = new DataView(accIDs);
             accountSender_IDComboBox.DataSource = new DataView(accIDs);
@@ -171,11 +169,11 @@ namespace BankingSite
                 //address to update may be set to null
                 if (String.IsNullOrWhiteSpace(address_IDComboBox.Text))
                 {
-                    _dbInt.InsertCustomerNoAddress(firstN, lastN, phoneN, email);
+					DatabaseInteraction.InsertCustomerNoAddress(firstN, lastN, phoneN, email);
                 }
                 else
                 {
-                    _dbInt.InsertCustomer(firstN, lastN, phoneN, email, Convert.ToInt32(address_IDComboBox.Text));
+					DatabaseInteraction.InsertCustomer(firstN, lastN, phoneN, email, Convert.ToInt32(address_IDComboBox.Text));
                 }
                 _hasCanceled = false;
                 Close();
@@ -205,7 +203,7 @@ namespace BankingSite
 
             try
             {
-                _dbInt.InsertAddress(streetName, streetNumber, zipCode, city);
+				DatabaseInteraction.InsertAddress(streetName, streetNumber, zipCode, city);
                 _hasCanceled = false;
                 Close();
             }
@@ -232,15 +230,14 @@ namespace BankingSite
 
             Random rnd = new Random();
             long hashCode = Math.Abs(countryCode.GetHashCode());
-            hashCode *= rnd.Next(1, 10);                                                            //try to make every hashcode different
+            hashCode *= rnd.Next(1, 10);                                                            //make every hashcode different
 
-            string iban = customer_IDComboBox.Text + (_dbInt.GetLastAccountID() + 1) + hashCode;    //at least every number before the hashcode will be different for every account
-            iban = iban.Length > 30 ? iban.Substring(0, 30) : iban;                                 //iban max length is 30
-            iban = countryCode + iban;
+            string strHashCode = hashCode.ToString();
+            strHashCode = strHashCode.Length > 15 ? strHashCode.Substring(0, 15) : strHashCode;     //limit length of hashcode
 
-            try
+			try
             {
-                _dbInt.InsertAccount(iban, balance, Convert.ToInt32(customer_IDComboBox.Text));
+				DatabaseInteraction.InsertAccount(balance, Convert.ToInt32(customer_IDComboBox.Text), strHashCode, countryCode);
                 _hasCanceled = false;
                 Close();
             }
@@ -287,28 +284,28 @@ namespace BankingSite
 
             try
             {
-                _dbInt.InsertTransaction(dateDateTimePicker.Value, amount, intendedUse, type, receiverID, senderID);
+				DatabaseInteraction.InsertTransaction(dateDateTimePicker.Value, amount, intendedUse, type, receiverID, senderID);
                 _hasCanceled = false;
                 Close();
 
                 //get balance from sender and update it based on the transaction balance
                 if (type == TransactionType.Withdrawal.ToString())
                 {
-                    _dbInt.WithdrawFromAccount(senderID, amount);
+					DatabaseInteraction.WithdrawFromAccount(senderID, amount);
                     return;
                 }
 
                 //get balance from sender and update it based on the transaction balance
                 if (type == TransactionType.Deposit.ToString())
                 {
-                    _dbInt.DepositToAccount(senderID, amount);
+					DatabaseInteraction.DepositToAccount(senderID, amount);
                     return;
                 }
 
                 //get balance from both ids and update it based on the transaction balance
                 if (type == TransactionType.Transfer.ToString())
                 {
-                    _dbInt.TransferFromSenderToReceiver(senderID, receiverID, amount);
+					DatabaseInteraction.TransferFromSenderToReceiver(senderID, receiverID, amount);
                     return;
                 }
             }

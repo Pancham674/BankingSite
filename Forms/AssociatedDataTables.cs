@@ -12,5 +12,10 @@ namespace BankingSite
             dgvAssosiatedDataTable.DataSource = data;
             dgvAssosiatedDataTable.Refresh();
         }
-    }
+
+		private void AssociatedDataTables_Load(object sender, System.EventArgs e)
+		{
+			CenterToParent();
+		}
+	}
 }
