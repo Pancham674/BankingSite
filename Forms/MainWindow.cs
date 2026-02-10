@@ -24,7 +24,7 @@ namespace BankingSite
 
         private void Window_Load(object sender, EventArgs e)
         {
-            txtbServerName.Text = string.Concat(Environment.MachineName, "\\");
+            txtbServerName.Text = string.Concat(Environment.MachineName, @"\");
         }
 
         /// <summary>
@@ -443,7 +443,7 @@ namespace BankingSite
 
             AssociatedDataTables owned = new AssociatedDataTables(accounts);
             owned.Text = string.Concat("Owned Accounts From Customer with ID ", custID);
-            owned.Show();
+            owned.Show(this);
         }
 
         /// <summary>
@@ -624,7 +624,7 @@ namespace BankingSite
 
             AssociatedDataTables owned = new AssociatedDataTables(transactions);
             owned.Text = string.Concat("Transactions Associated with Account ID ", accID);
-            owned.Show();
+            owned.Show(this);
         }
 
         private void btnDeleteSelectedAccount_Click(object sender, EventArgs e)

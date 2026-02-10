@@ -66,6 +66,7 @@
 			this.ShowIcon = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "AssotiatedDataTables";
+			this.Load += new System.EventHandler(this.AssociatedDataTables_Load);
 			((System.ComponentModel.ISupportInitialize)(this.dgvAssosiatedDataTable)).EndInit();
 			this.ResumeLayout(false);
 

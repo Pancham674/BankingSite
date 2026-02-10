@@ -66,36 +66,36 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CreateNew.cs">
+    <Compile Include="Data\DatabaseInteraction.cs" />
+    <Compile Include="Data\DrawingControl.cs" />
+    <Compile Include="Forms\AssociatedDataTables.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CreateNew.Designer.cs">
+    <Compile Include="Forms\AssociatedDataTables.Designer.cs">
+      <DependentUpon>AssociatedDataTables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CreateNew.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CreateNew.Designer.cs">
       <DependentUpon>CreateNew.cs</DependentUpon>
     </Compile>
-    <Compile Include="DatabaseInteraction.cs" />
-    <Compile Include="DrawingControl.cs" />
-    <Compile Include="MainWindow.cs">
+    <Compile Include="Forms\MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MainWindow.Designer.cs">
+    <Compile Include="Forms\MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="AssociatedDataTables.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AssociatedDataTables.Designer.cs">
-      <DependentUpon>AssociatedDataTables.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="CreateNew.resx">
+    <EmbeddedResource Include="Forms\AssociatedDataTables.resx">
+      <DependentUpon>AssociatedDataTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CreateNew.resx">
       <DependentUpon>CreateNew.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MainWindow.resx">
+    <EmbeddedResource Include="Forms\MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="AssociatedDataTables.resx">
-      <DependentUpon>AssociatedDataTables.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

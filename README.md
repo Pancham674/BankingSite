@@ -1,9 +1,9 @@
-A Windows App made with Winforms  and C# that mainly uses a MSSQL connection to save data. The program is a pretend like banking program, that let's you create customers, addresses multiple customers reside in, bank accounts for specific customer and transactions of or between two accounts. 
+A Windows App made with Winforms and C# that mainly uses a MSSQL connection to save data. The program is a pretend like banking program, that let's you create customers, addresses that multiple customers can reside in, bank accounts for a specific customer and transactions that include one or two accounts. 
 
 ---
 ## Images
 ![Startscreen](images/DBConnection.png)
-The startscreen, where the connection will be established and default data can be inserted.
+The startscreen, where the connection will be established, default data can be inserted and all data deleted.
 \
 \
 \
@@ -16,10 +16,11 @@ Overview of all customers and addresses along with the ability to add, change an
 
 - Connection to MSSQL DB though LogIn
 - Creation of addresses, customers, bank accounts and transactions
-- Isertion of default data
+- Insertion of default data
+- Deletion of all data
 - Overview of all data
-- Overview of all accounts of specific customer
-- Overview of all transactions of specific account
+- Overview of all accounts tied to a specific customer
+- Overview of all transactions associated to a specific account
 - Deletion of selected data
 - Saving of data to DB after any change
 
@@ -35,4 +36,4 @@ Overview of all customers and addresses along with the ability to add, change an
 2. Run program
    ````bash
    dotnet build
-   BankingSite\bin\Debug\net8.0-windows\BankingSite.exe
+   bin\Debug\BankingSite.exe
