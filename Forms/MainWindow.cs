@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -235,7 +236,7 @@ namespace BankingSite
                     MessageBox.Show("Succsessfully connected to database!", "Connection to database established.");
                 }
             }
-            catch (Exception ex)
+			catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "An Error ocurred");
             }
@@ -253,13 +254,16 @@ namespace BankingSite
                 DatabaseInteraction.CanConnectToServer(String.IsNullOrWhiteSpace(cbDbNames.Text) ? "master" : cbDbNames.Text, txtbServerName.Text, txtbUsername.Text, txtbPassword.Text);
                 return true;
             }
-            catch (Exception e)
+			catch (TypeInitializationException dirEx)
+			{
+				MessageBox.Show(dirEx.InnerException.Message, "Error while trying to connect");
+			}
+			catch (Exception ex)
             {
-
-                MessageBox.Show(e.Message, "Error while trying to connect");
-                return false;
+                MessageBox.Show(ex.Message, "Error while trying to connect");
             }
-        }
+            return false;
+		}
 
 		/// <summary>
 		/// Refreshes all DataTables, DataGridViews and Controls associated with them.

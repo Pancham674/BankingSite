@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BankingSite
@@ -14,12 +15,12 @@ namespace BankingSite
 		static string _connectionString;
 		static string _connectedDatabase;
 
-        const string SQL_FOLDER = @"..\..\SQL\";
-        const string INSERT_DATA_FOLDER = SQL_FOLDER + @"InsertData\";
-        const string CREATE_TABLE_FOLDER = SQL_FOLDER + @"CreateTable\";
-        const string GET_DATA_FOLDER = SQL_FOLDER + @"GetData\";
-        const string UPDATE_TABLE_FOLDER = SQL_FOLDER + @"UpdateTable\";
-        const string DELETE_FOLDER = SQL_FOLDER + @"DeleteData\";
+        static string _sqlDir = GetSqlDir();
+		static string _insertDataDir = _sqlDir + @"InsertData\";
+		static string _createTableDir = _sqlDir + @"CreateTable\";
+		static string _getDataDir = _sqlDir + @"GetData\";
+		static string _updateTableDir = _sqlDir + @"UpdateTable\";
+		static string _deleteDir = _sqlDir + @"DeleteData\";
 
         const string ADDRESS = "Address";
         const string CUSTOMER = "Customer";
@@ -135,28 +136,28 @@ namespace BankingSite
 
                     if (missingTable.Equals(ADDRESS))
                     {
-                        cmd.CommandText = File.ReadAllText(string.Concat(CREATE_TABLE_FOLDER, ADDRESS, SQL_EXTENSION));
+                        cmd.CommandText = File.ReadAllText(string.Concat(_createTableDir, ADDRESS, SQL_EXTENSION));
                         cmd.ExecuteNonQuery();
                         continue;
                     }
 
                     if (missingTable.Equals(CUSTOMER))
                     {
-                        cmd.CommandText = File.ReadAllText(string.Concat(CREATE_TABLE_FOLDER, CUSTOMER, SQL_EXTENSION));
+                        cmd.CommandText = File.ReadAllText(string.Concat(_createTableDir, CUSTOMER, SQL_EXTENSION));
                         cmd.ExecuteNonQuery();
                         continue;
                     }
 
                     if (missingTable.Equals(ACCOUNT))
                     {
-                        cmd.CommandText = File.ReadAllText(string.Concat(CREATE_TABLE_FOLDER, ACCOUNT, SQL_EXTENSION));
+                        cmd.CommandText = File.ReadAllText(string.Concat(_createTableDir, ACCOUNT, SQL_EXTENSION));
                         cmd.ExecuteNonQuery();
                         continue;
                     }
 
                     if (missingTable.Equals(TRANSACTION))
                     {
-                        cmd.CommandText = File.ReadAllText(string.Concat(CREATE_TABLE_FOLDER, TRANSACTION, SQL_EXTENSION));
+                        cmd.CommandText = File.ReadAllText(string.Concat(_createTableDir, TRANSACTION, SQL_EXTENSION));
                         cmd.ExecuteNonQuery();
                         tablesCreated = true;
                         continue;
@@ -178,17 +179,47 @@ namespace BankingSite
                 SqlCommand cmd = cn.CreateCommand();
                 cmd.CommandTimeout = 5;
 
-                cmd.CommandText = File.ReadAllText(string.Concat(CREATE_TABLE_FOLDER, "CustomerTrigger", SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_createTableDir, "CustomerTrigger", SQL_EXTENSION));
                 cmd.ExecuteNonQuery();
 
-                cmd.CommandText = File.ReadAllText(string.Concat(CREATE_TABLE_FOLDER, "AccountTrigger", SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_createTableDir, "AccountTrigger", SQL_EXTENSION));
                 cmd.ExecuteNonQuery();
             }
         }
-        #endregion
 
-        #region SQL Insert Methods
-        public static void InsertToAllTables()
+        /// <summary>
+        /// Will get the SQL Directory, where all sql files reside. Neccessary for Testing since its in a different dir than this project.
+        /// </summary>
+        /// <returns></returns>
+        static string GetSqlDir()
+        {
+            string sqlDir = string.Empty;
+            string[] directories = Environment.CurrentDirectory.Split(Path.DirectorySeparatorChar);
+			do  //Go down to the "BankingSite" subdirectory (take one away since we always start in the "\bin\Debug" path anyway)
+			{
+                directories = directories.Take(directories.Length - 1).ToArray();
+            }
+            while (!directories[directories.Length - 1].ToLower().Equals("bankingsiteproject"));
+
+			//once the subdir is found, add all the directories back to the path
+			foreach (string dir in directories)
+            {
+                sqlDir = string.Concat(sqlDir, dir, @"\");
+            }
+
+            sqlDir = string.Concat(sqlDir, @"BankingSite\SQL\");
+
+            if (!Directory.Exists(sqlDir))
+            {
+                throw new DirectoryNotFoundException(string.Concat("The path \"", @"\BankingSite\SQL\", "\" couldn't be found in \"", sqlDir,
+                                "\". If it has been moved then please move it back to its original location and restart the application."));
+            }
+			return sqlDir;
+        }
+		#endregion
+
+		#region SQL Insert Methods
+		public static void InsertToAllTables()
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {
@@ -196,16 +227,16 @@ namespace BankingSite
                 SqlCommand cmd = cn.CreateCommand();
                 cmd.CommandTimeout = 5;
 
-                cmd.CommandText = File.ReadAllText(string.Concat(INSERT_DATA_FOLDER, "DefaultAddresses", SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_insertDataDir, "DefaultAddresses", SQL_EXTENSION));
                 cmd.ExecuteNonQuery();
 
-                cmd.CommandText = File.ReadAllText(string.Concat(INSERT_DATA_FOLDER, "DefaultCustomers", SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_insertDataDir, "DefaultCustomers", SQL_EXTENSION));
                 cmd.ExecuteNonQuery();
 
-                cmd.CommandText = File.ReadAllText(string.Concat(INSERT_DATA_FOLDER, "DefaultAccounts", SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_insertDataDir, "DefaultAccounts", SQL_EXTENSION));
                 cmd.ExecuteNonQuery();
 
-                cmd.CommandText = File.ReadAllText(string.Concat(INSERT_DATA_FOLDER, "DefaultTransactions", SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_insertDataDir, "DefaultTransactions", SQL_EXTENSION));
                 cmd.ExecuteNonQuery();
             }
         }
@@ -216,7 +247,7 @@ namespace BankingSite
             {
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandText = File.ReadAllText(string.Concat(INSERT_DATA_FOLDER, CUSTOMER, SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_insertDataDir, CUSTOMER, SQL_EXTENSION));
                 cmd.CommandTimeout = 5;
 
                 cmd.Parameters.AddWithValue("@FirstName", myFirstName);
@@ -234,7 +265,7 @@ namespace BankingSite
             {
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandText = File.ReadAllText(string.Concat(INSERT_DATA_FOLDER, "CustomerNoAddress", SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_insertDataDir, "CustomerNoAddress", SQL_EXTENSION));
                 cmd.CommandTimeout = 5;
 
                 cmd.Parameters.AddWithValue("@FirstName", myFirstName);
@@ -251,7 +282,7 @@ namespace BankingSite
             {
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandText = File.ReadAllText(string.Concat(INSERT_DATA_FOLDER, ADDRESS, SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_insertDataDir, ADDRESS, SQL_EXTENSION));
                 cmd.CommandTimeout = 5;
 
                 cmd.Parameters.AddWithValue("@StreetName", myStreetName);
@@ -268,7 +299,7 @@ namespace BankingSite
             {   //Insert the new account first, then update its IBAN so it has the correct account id in it
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandText = File.ReadAllText(string.Concat(INSERT_DATA_FOLDER, ACCOUNT, SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_insertDataDir, ACCOUNT, SQL_EXTENSION));
                 cmd.CommandTimeout = 5;
 
                 cmd.Parameters.AddWithValue("@IBAN", "Empty");
@@ -278,7 +309,7 @@ namespace BankingSite
 
                 int id = GetLastAccountID();
 				string iban = myCountryCode + myCustomerID + id + myHashCode;
-                cmd.CommandText = File.ReadAllText(String.Concat(UPDATE_TABLE_FOLDER, ACCOUNT, "Iban", SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(String.Concat(_updateTableDir, ACCOUNT, "Iban", SQL_EXTENSION));
 
                 cmd.Parameters["@IBAN"].Value = iban;
                 cmd.Parameters.AddWithValue("@ID", id);
@@ -292,7 +323,7 @@ namespace BankingSite
             {
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandText = File.ReadAllText(string.Concat(INSERT_DATA_FOLDER, TRANSACTION, SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_insertDataDir, TRANSACTION, SQL_EXTENSION));
                 cmd.CommandTimeout = 5;
 
                 cmd.Parameters.AddWithValue("@Date", myDate);
@@ -313,7 +344,7 @@ namespace BankingSite
             {
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandText = File.ReadAllText(string.Concat(UPDATE_TABLE_FOLDER, CUSTOMER, SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_updateTableDir, CUSTOMER, SQL_EXTENSION));
                 cmd.CommandTimeout = 5;
 
                 cmd.Parameters.AddWithValue("@FirstName", myFirstName);
@@ -332,7 +363,7 @@ namespace BankingSite
             {
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandText = File.ReadAllText(string.Concat(UPDATE_TABLE_FOLDER, "CustomerNoAddress", SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_updateTableDir, "CustomerNoAddress", SQL_EXTENSION));
                 cmd.CommandTimeout = 5;
 
                 cmd.Parameters.AddWithValue("@FirstName", myFirstName);
@@ -350,7 +381,7 @@ namespace BankingSite
             {
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandText = File.ReadAllText(string.Concat(UPDATE_TABLE_FOLDER, "AccountBalance", SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_updateTableDir, "AccountBalance", SQL_EXTENSION));
                 cmd.CommandTimeout = 5;
 
                 cmd.Parameters.AddWithValue("@Balance", myNewBalance);
@@ -365,7 +396,7 @@ namespace BankingSite
             {
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandText = File.ReadAllText(string.Concat(UPDATE_TABLE_FOLDER, ADDRESS, SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_updateTableDir, ADDRESS, SQL_EXTENSION));
                 cmd.CommandTimeout = 5;
 
                 cmd.Parameters.AddWithValue("@StreetName", myStreetName);
@@ -385,7 +416,7 @@ namespace BankingSite
             {
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandText = File.ReadAllText(string.Concat(DELETE_FOLDER, "AllData", SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_deleteDir, "AllData", SQL_EXTENSION));
                 
                 cmd.CommandTimeout = 5;
                 cmd.ExecuteNonQuery();
@@ -398,7 +429,7 @@ namespace BankingSite
             {
                 cn.Open();
                 SqlCommand cmd = cn.CreateCommand();
-                cmd.CommandText = File.ReadAllText(string.Concat(DELETE_FOLDER, myType, SQL_EXTENSION));
+                cmd.CommandText = File.ReadAllText(string.Concat(_deleteDir, myType, SQL_EXTENSION));
                 cmd.CommandTimeout = 5;
 
                 cmd.Parameters.AddWithValue("@ID", myID);
@@ -454,34 +485,34 @@ namespace BankingSite
 
         public static DataTable GetOwnedAccountsByCustomerID(int myCustomerID)
         {
-            string cmdText = File.ReadAllText(string.Concat(GET_DATA_FOLDER, "AllAssociatedAccounts", SQL_EXTENSION));
+            string cmdText = File.ReadAllText(string.Concat(_getDataDir, "AllAssociatedAccounts", SQL_EXTENSION));
             return GetDataTable(string.Format(cmdText, myCustomerID));
         }
 
         public static DataTable GetAllTransactionsFromAccountID(int myAccountID)
         {
-            string cmdText = File.ReadAllText(string.Concat(GET_DATA_FOLDER, "AllAssociatedTransactions", SQL_EXTENSION));
+            string cmdText = File.ReadAllText(string.Concat(_getDataDir, "AllAssociatedTransactions", SQL_EXTENSION));
             return GetDataTable(string.Format(cmdText, myAccountID));
         }
 
         public static DataTable GetAllAddresses()
         {
-            return GetDataTable(File.ReadAllText(string.Concat(GET_DATA_FOLDER, "AllAddresses", SQL_EXTENSION)));
+            return GetDataTable(File.ReadAllText(string.Concat(_getDataDir, "AllAddresses", SQL_EXTENSION)));
         }
 
         public static DataTable GetAllCustomers()
         {
-            return GetDataTable(File.ReadAllText(string.Concat(GET_DATA_FOLDER, "AllCustomers", SQL_EXTENSION)));
+            return GetDataTable(File.ReadAllText(string.Concat(_getDataDir, "AllCustomers", SQL_EXTENSION)));
         }
 
         public static DataTable GetAllAccounts()
         {
-            return GetDataTable(File.ReadAllText(string.Concat(GET_DATA_FOLDER, "AllAccounts", SQL_EXTENSION)));
+            return GetDataTable(File.ReadAllText(string.Concat(_getDataDir, "AllAccounts", SQL_EXTENSION)));
         }
 
         public static DataTable GetAllTransactions()
         {
-            return GetDataTable(File.ReadAllText(string.Concat(GET_DATA_FOLDER, "AllTransactions", SQL_EXTENSION)));
+            return GetDataTable(File.ReadAllText(string.Concat(_getDataDir, "AllTransactions", SQL_EXTENSION)));
         }
 
         public static int GetLastAccountID()
@@ -500,7 +531,7 @@ namespace BankingSite
         /// <param name="myAmount"></param>
         public static void WithdrawFromAccount(int myAccountID, int myAmount)
         {
-            string cmdText = File.ReadAllText(string.Concat(GET_DATA_FOLDER, "BalanceFromAccountID", SQL_EXTENSION));
+            string cmdText = File.ReadAllText(string.Concat(_getDataDir, "BalanceFromAccountID", SQL_EXTENSION));
             DataTable temp = GetDataTable(string.Format(cmdText, myAccountID));
 
             int currentBalance = Convert.ToInt32(temp.Rows[0].ItemArray[0]);
@@ -516,7 +547,7 @@ namespace BankingSite
         /// <param name="myAmount"></param>
         public static void DepositToAccount(int myAccountID, int myAmount)
         {
-            string cmdText = File.ReadAllText(string.Concat(GET_DATA_FOLDER, "BalanceFromAccountID", SQL_EXTENSION));
+            string cmdText = File.ReadAllText(string.Concat(_getDataDir, "BalanceFromAccountID", SQL_EXTENSION));
             DataTable temp = GetDataTable(string.Format(cmdText, myAccountID));
 
             int currentBalance = Convert.ToInt32(temp.Rows[0].ItemArray[0]);
