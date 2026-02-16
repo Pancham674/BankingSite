@@ -14,8 +14,8 @@ namespace BankingSite.UnitTest
 		string _servername = string.Concat(Environment.MachineName, @"\SQLEXPRESS");
 		string _u = File.ReadAllText(@"..\..\secret.txt").Split()[0];
 		string _p = File.ReadAllText(@"..\..\secret.txt").Split()[2];
-		
-		#region Init and Cleanup
+
+		#region Methods		
 		//[ClassInitialize]
 		void ConnectToTestDb()
 		{
@@ -24,17 +24,12 @@ namespace BankingSite.UnitTest
 			//DatabaseInteraction.InsertToAllTables();
 		}
 
-		[ClassCleanup]
-		public static void ClearDbData()
+		//[ClassCleanup]
+		void ClearDbData()
 		{
-			if (!DatabaseInteraction.ConnectedDatabase.Equals("EmptyBankingSiteTest"))
-			{
-				DatabaseInteraction.DeleteAllDataFromAllTables();
-			}
+			DatabaseInteraction.DeleteAllDataFromAllTables();
 		}
-		#endregion
 
-		#region Methods
 		void RemoveAllTables(string myDb)
 		{
 			string cnString = string.Concat("Data Source=", _servername, ";Initial Catalog=", myDb, ";UID=", _u, ";Password=", _p,
@@ -54,6 +49,7 @@ namespace BankingSite.UnitTest
 			}
 		}
 		#endregion
+
 		#region DB connection tests
 		[TestMethod]
 		public void CanConnectToServer_IncorrectCredentials_ReturnsSqlException()
@@ -69,17 +65,17 @@ namespace BankingSite.UnitTest
 		}
 
 		[TestMethod]
-		public void GetDatabases_CompareToSystemDatabases_AreNotEquivalent()
+		public void GetDatabases_CompareAvailableDbsToSystemDbs_ReturnsFalse()
 		{
 			//Given: All system dbs
 			ConnectToTestDb();
-			string[] sysDbs = { "master", "tempdb", "model", "msdb" };
+			string[] sysDbs = { "master", "tempdb", "model", "msdb"};
 
-			//When: Get all dbs that exclude system dbs
-			string[] currentDbs = DatabaseInteraction.GetDatabases().ToArray();
+			//When: Get all available dbs that SHOULD exclude system dbs
+			string[] currentDbs = DatabaseInteraction.GetDatabases();
 
 			//Then: The currentDbs shouldn't contain any system db
-			CollectionAssert.AreNotEquivalent(currentDbs, sysDbs);
+			Assert.IsFalse(sysDbs.Any(db => currentDbs.Contains(db)));
 		}
 
 		//Method Names: MethodName_Scenario_ExpectedResult
@@ -112,12 +108,12 @@ namespace BankingSite.UnitTest
 		[TestMethod]
 		public void CreateTables_DbHasNoTables_ReturnsEmptyList()
 		{
-			//Given: Connect to db that has all required tables
+			//Given: Connect to db that doesn't have all required tables and get the list of them
 			string db = "EmptyBankingSiteTest";
 			DatabaseInteraction.CanConnectToServer(db, _servername, _u, _p);
 			List<string> missingTables = DatabaseInteraction.GetMissingTables();
 
-			//When: Get the list of missing tables
+			//When: Create all missing tables
 			DatabaseInteraction.CreateTables(missingTables);
 
 			//Assume: the db had 4 missing tables before creating them
@@ -128,6 +124,23 @@ namespace BankingSite.UnitTest
 
 			//Cleanup: Remove the tables for other tests
 			RemoveAllTables(db);
+		}
+
+		[TestMethod]
+		[DataRow("master")]
+		[DataRow("tempdb")]
+		[DataRow("model")]
+		[DataRow("msdb")]
+		public void IsConnectedToSysDb_ConnectedDbIsSysDb_ReturnsTrue(string mySysDb)
+		{
+			//Given: Connect to a system db
+			DatabaseInteraction.CanConnectToServer(mySysDb, _servername, _u, _p);
+
+			//When: Check if we're connected to a sys db
+			bool isConnectedToSysDb = DatabaseInteraction.IsConnectedToSysDb();
+			
+			//Then: Should return true
+			Assert.IsTrue(isConnectedToSysDb);
 		}
 		#endregion
 
@@ -149,13 +162,15 @@ namespace BankingSite.UnitTest
 			//Then: The newly added row has the same data as the data we added
 			bool addedRowHasEqualData = addedRow.ItemArray[1].Equals(StreetName) && addedRow.ItemArray[2].Equals(StreetNum) && addedRow.ItemArray[3].Equals(ZipCode) && addedRow.ItemArray[4].Equals(City);
 			Assert.IsTrue(addedRowHasEqualData);
+
+			ClearDbData();
 		}
 
 		[TestMethod]
 		[DataRow("Monster's Street", 67, 1225, "Home Town")]
 		[DataRow("Graffity Alley", 3, 4004, "Canvas Town")]
 		[DataRow("Gang Way", 2, 1712, "Orth")]
-		public void GetAllAddressesDeleteNewAddress_AddressAddedAndDeleted_OldAndNewTablesAreEqual(string StreetName, int StreetNum, int ZipCode, string City)
+		public void DeleteAddressWithID_AddressAddedAndDeleted_OldAndNewTablesAreEqual(string StreetName, int StreetNum, int ZipCode, string City)
 		{
 			//Given: A new address is added
 			ConnectToTestDb();
@@ -176,6 +191,8 @@ namespace BankingSite.UnitTest
 			{
 				Assert.AreEqual(addrTable.Rows[i].ItemArray[0], updAddrTable.Rows[i].ItemArray[0]);
 			}
+		
+			ClearDbData();
 		}
 		#endregion
 
