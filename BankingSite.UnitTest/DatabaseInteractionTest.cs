@@ -144,28 +144,31 @@ namespace BankingSite.UnitTest
 		}
 		#endregion
 
-		#region Address Tests
+		#region SQL Insert & Get Tests
 		[TestMethod]
 		[DataRow("Monster's Street", 67, 1225, "Home Town")]
 		[DataRow("Graffity Alley", 3, 4004, "Canvas Town")]
 		[DataRow("Gang Way", 2, 1712, "Orth")]
-		public void GetAllAddresses_NewRowAdded_NewRowExistsWithEqualData(string StreetName, int StreetNum, int ZipCode, string City)
+		public void InsertAndGetAllAddresses_CompareNewRowWithParameters_ReturnsTrue(string StreetName, int StreetNum, int ZipCode, string City)
 		{
 			//Given: A new address is added
 			ConnectToTestDb();
 			DatabaseInteraction.InsertAddress(StreetName, StreetNum, ZipCode, City);
-			DataTable addrTable = DatabaseInteraction.GetAllAddresses();
 			
 			//When: We get the newly added row
+			DataTable addrTable = DatabaseInteraction.GetAllAddresses();
 			DataRow addedRow = addrTable.Rows[addrTable.Rows.Count - 1];
 
 			//Then: The newly added row has the same data as the data we added
 			bool addedRowHasEqualData = addedRow.ItemArray[1].Equals(StreetName) && addedRow.ItemArray[2].Equals(StreetNum) && addedRow.ItemArray[3].Equals(ZipCode) && addedRow.ItemArray[4].Equals(City);
 			Assert.IsTrue(addedRowHasEqualData);
 
+			//Cleanup: Clear the data for other tests
 			ClearDbData();
 		}
+		#endregion
 
+		#region SQL Delete Tests
 		[TestMethod]
 		[DataRow("Monster's Street", 67, 1225, "Home Town")]
 		[DataRow("Graffity Alley", 3, 4004, "Canvas Town")]
@@ -191,18 +194,7 @@ namespace BankingSite.UnitTest
 			{
 				Assert.AreEqual(addrTable.Rows[i].ItemArray[0], updAddrTable.Rows[i].ItemArray[0]);
 			}
-		
-			ClearDbData();
 		}
-		#endregion
-
-		#region Customer Tests
-		#endregion
-
-		#region Account Tests
-		#endregion
-
-		#region Transaction Tests
 		#endregion
 	}
 }

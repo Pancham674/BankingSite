@@ -568,7 +568,5 @@ namespace BankingSite
             DepositToAccount(myReceiverID, myAmount);
         }
         #endregion
-
-        public static string ConnectedDatabase { get => _connectedDatabase; }
 	}
 }
