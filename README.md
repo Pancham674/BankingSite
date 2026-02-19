@@ -30,8 +30,8 @@ Overview of all customers and addresses along with the ability to add, change an
 
 1. Clone repo:
    ```bash
-   git clone https://github.com/Pancham674/BankingSite.git
-   cd BankingSite
+   git clone https://github.com/Pancham674/BankingSiteProject.git
+   cd BankingSiteProject
    
 2. Run program
    ````bash
