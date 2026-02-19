@@ -36,4 +36,4 @@ Overview of all customers and addresses along with the ability to add, change an
 2. Run program
    ````bash
    dotnet build
-   bin\Debug\BankingSite.exe
+   BankingSite\bin\Debug\BankingSite.exe
