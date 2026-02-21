@@ -39,18 +39,24 @@ namespace BankingSite
         /// <param name="myUsername"></param>
         /// <param name="myPassword"></param>
         /// <returns></returns>
-        public static void CanConnectToServer(string myDb, string myServerName, string myUsername, string myPassword)
+        public static void ConnectToServer(string myDb, string myServerName, string myUsername, string myPassword)
         {
-            string cnString = string.Concat("Data Source=", myServerName, ";Initial Catalog=", myDb, ";UID=", myUsername, ";Password=", myPassword,
-                        ";Integrated Security=False;TrustServerCertificate=True");
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(cnString);
-            builder.ConnectTimeout = 5;
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder()
+            {
+                DataSource = myServerName,
+                InitialCatalog = myDb,
+                UserID = myUsername,
+                Password = myPassword,
+                IntegratedSecurity = false,
+                TrustServerCertificate = true,
+                ConnectTimeout = 5
+			};
 
             using (SqlConnection cn = new SqlConnection(builder.ConnectionString))
             {
                 cn.Open();
-                _connectionString = cnString;
-                _connectedDatabase = myDb;
+                _connectionString = builder.ConnectionString;
+                _connectedDatabase = builder.InitialCatalog;
             }
         }
 
@@ -259,7 +265,7 @@ namespace BankingSite
             }
         }
 
-        public static void InsertCustomerNoAddress(string myFirstName, string myLastName, int myPhoneNumber, string myEmail)
+        public static void InsertCustomer(string myFirstName, string myLastName, int myPhoneNumber, string myEmail)
         {
             using (SqlConnection cn = new SqlConnection(_connectionString))
             {

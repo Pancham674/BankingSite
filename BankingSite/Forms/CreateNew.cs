@@ -169,7 +169,7 @@ namespace BankingSite
                 //address to update may be set to null
                 if (String.IsNullOrWhiteSpace(address_IDComboBox.Text))
                 {
-					DatabaseInteraction.InsertCustomerNoAddress(firstN, lastN, phoneN, email);
+					DatabaseInteraction.InsertCustomer(firstN, lastN, phoneN, email);
                 }
                 else
                 {

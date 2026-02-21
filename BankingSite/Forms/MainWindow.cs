@@ -251,7 +251,7 @@ namespace BankingSite
                     throw new Exception("Please provide a Server name, Username and Password before attemping to connect.");
                 }
 
-                DatabaseInteraction.CanConnectToServer(String.IsNullOrWhiteSpace(cbDbNames.Text) ? "master" : cbDbNames.Text, txtbServerName.Text, txtbUsername.Text, txtbPassword.Text);
+                DatabaseInteraction.ConnectToServer(String.IsNullOrWhiteSpace(cbDbNames.Text) ? "master" : cbDbNames.Text, txtbServerName.Text, txtbUsername.Text, txtbPassword.Text);
                 return true;
             }
 			catch (TypeInitializationException dirEx)
